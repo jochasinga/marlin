@@ -1,0 +1,12 @@
+SUPER  : ".super"
+SOURCE : ".source"
+END    : ".end"
+IMPL   : ".implements"
+FIELD  : ".field"
+CLASS  : ".class"
+METHOD : ".method"
+LOCALS : ".locals"
+ANNOTATION : ".annotation"
+CATCH : ".catch"
+
+DIRECTIVE : /\.[a-zA-Z0-9\_\-]+/

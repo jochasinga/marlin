@@ -1,0 +1,8 @@
+MOD     : "static" | "final" | "abstract" | "synchronized" | "volatile"
+ACC_MOD : "public" | "private" | "protected"
+CON     : "constructor"
+INIT    : "<init>"
+CLINIT  : "<clinit>"
+METHOD  : "method"
+SYSTEM  : "system"
+ANNO    : "annotation"

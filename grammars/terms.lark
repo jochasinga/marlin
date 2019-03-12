@@ -1,0 +1,8 @@
+COLON  : ":"
+COMMA  : ","
+DOT    : "."
+LPAREN : "("
+RPAREN : ")"
+LBRACK : "{"
+RBRACK : "}"
+DOLLAR : "$"
