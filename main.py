@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     gen_opcode_names()
 
-    with open('smali/Foo.smali', 'r') as sm:
+    with open('smali/Sandbox.smali', 'r') as sm:
         text = sm.read()
 
     with open("grammars/main.lark", "r") as f:
