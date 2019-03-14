@@ -6,7 +6,7 @@ FIELD  : ".field"
 CLASS  : ".class"
 METHOD : ".method"
 LOCALS : ".locals"
-ANNOTATION : ".annotation"
-CATCH : ".catch"
+ANNO   : ".annotation"
+CATCH  : ".catch"
 
 DIRECTIVE : /\.[a-zA-Z0-9\_\-]+/

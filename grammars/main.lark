@@ -5,37 +5,33 @@
 
 ?start : class
 
-class      : class_def class_body
-class_def  : class_header (_NEWLINE class_stmt)*
-class_body : (_NEWLINE method_def)*
-class_stmt : super_stmt
-           | source_stmt
-           | impl_stmt
-           | field_stmt
-           | anno_stmt
+class       : class_def class_body
+class_def   : class_header (_NEWLINE class_stmt)*
+class_body  : (_NEWLINE method_def)* [_NEWLINE]
+class_stmt  : super_stmt
+            | source_stmt
+            | impl_stmt
+            | field_stmt
+            | anno_stmt
 
-// class_def : class_sig (_NEWLINE super_stmt)* [_NEWLINE source_stmt] [_NEWLINE impl_stmt]
-// class_body : (_NEWLINE [label] op_stmt)*
 label : _COLON LABEL
-// ?class_end : CLASS_END
-// class_header : CLASS (MOD)* (ACC_MOD)* CLASS_NAME
-class_header : CLASS modifiers class_name
+?class_header : _CLASS modifiers class_name
 modifiers    : [(mod)* (acc_mod)*]
 mod          : MOD
 acc_mod      : ACC_MOD
 class_name   : CLASS_NAME
 
 // Class header statements
-super_stmt      : SUPER base_class_name
-base_class_name : CLASS_NAME
+super_stmt       : _SUPER base_class_name
+?base_class_name : CLASS_NAME
 
 // Source statement
-source_stmt : SOURCE file_name
-file_name   : STRING
+source_stmt : _SOURCE file_name
+?file_name  : STRING
 
 // Implementation statement
-impl_stmt      : IMPL interface_name
-interface_name : CLASS_NAME
+impl_stmt       : _IMPL interface_name
+?interface_name : CLASS_NAME
 
 method_stmt : op_stmt
             | dir_stmt
@@ -44,19 +40,21 @@ method_stmt : op_stmt
 
 // Annotation statement
 anno_stmt   : anno_header _NEWLINE anno_body _NEWLINE anno_end
-anno_header : ANNOTATION SYSTEM CLASS_NAME
+anno_header : _ANNO system class_name
+system      : SYSTEM
 anno_body   : "value = {" [_NEWLINE] values [_NEWLINE] "}"
 anno_end    : _END _K_ANNO [_NEWLINE]
 values      : [value (_COMMA value)*]
-value       : STRING
+?value      : STRING
+            | CLASS_NAME
 
 // Field statement
-field_stmt : field_block | field_def
-// field_def : FIELD (MOD)* (ACC_MOD)* SYMBOL _COLON OBJECT
-field_def : FIELD modifiers symbol _COLON object
-symbol    : SYMBOL
-object    : OBJECT
-field_block : field_def
+field_stmt  : (field_block | field_def)
+field_def   : _FIELD modifiers symbol _COLON object
+symbol      : SYMBOL
+object      : OBJECT
+field_block : field_def (_NEWLINE anno_stmt)* field_end
+field_end : _END _K_FIELD [_NEWLINE]
 
 // Opcode statement
 op_stmt : op_name (args)*
@@ -81,56 +79,57 @@ catch_dir : _CATCH error "{" label ".." label "}" label
 error : CLASS_NAME
 
 // Method statement
-method_def : method_header method_body method_end
-// method_header : METHOD (MOD)* (ACC_MOD)* ((CON (INIT | CLINIT)) | METHOD_NAME) method_sig
+method_def    : method_header method_body method_end
 method_header : _D_METHOD [(mod)* (acc_mod)*] (constructor | method_name) method_sig
 constructor : (_CON (INIT | CLINIT))
 method_name : METHOD_NAME
-// method_sig : _LPAREN (METHOD_ARG)* _RPAREN TYPE
 method_sig  : _LPAREN method_args _RPAREN return_type
 method_args : (method_arg)*
 method_arg  : METHOD_ARG
-method_body : (_NEWLINE [label] method_stmt)*
+method_body : (_NEWLINE (label | method_stmt))*
 method_end  : _END _K_METHOD [_NEWLINE]
 return_type : TYPE
 
-// CLASS_END: END [_NEWLINE]
-SYMBOL           : /[a-z]+/
-VAR              : /[pv][0-9]+/
-SUBCLASS_NAME    : /\$[A-Z][a-zA-Z0-9\_\-]/
-CLASS_NAME       : /L[a-zA-Z0-9\_\-\/]+(SUBCLASS_NAME)*\;/
-METHOD_NAME      : CNAME
-PRIMITIVE: "Z" | "B" | "S" | "C" | "I" | "J" | "F" | "D"
-VOID: "V"
-OBJECT: /\[*L[a-zA-Z0-9\_\-\$\/]+\;/
-TYPE: PRIMITIVE | VOID | OBJECT
-METHOD_ARG: PRIMITIVE | OBJECT
-COMMENT: /#[^\n]*/
-LABEL: /(goto|try_start|try_end|catch|cond)\_[0-9]+/
-_NEWLINE: ( /\r?\n[\t ]*/ | COMMENT )+
+SYMBOL        : /[a-z]+/
+VAR           : /[pv][0-9]+/
+SUBCLASS_NAME : /\$[A-Z][a-zA-Z0-9\_\-]/
+CLASS_NAME    : /L[a-zA-Z0-9\_\-\/]+(SUBCLASS_NAME)*\;/
+METHOD_NAME   : CNAME
+PRIMITIVE     : "Z" | "B" | "S" | "C" | "I" | "J" | "F" | "D"
+VOID          : "V"
+OBJECT     : /\[*L[a-zA-Z0-9\_\-\$\/]+\;/
+TYPE       : PRIMITIVE | VOID | OBJECT
+METHOD_ARG : PRIMITIVE | OBJECT
+COMMENT    : /#[^\n]*/
+LABEL      : /(goto|try_start|try_end|catch|cond)(\_[0-9])*/
+_NEWLINE   : (/\r?\n[\t ]*/ | COMMENT)+
 
 //////////////////////////// Import /////////////////////////////
-
 
 %import common.ESCAPED_STRING   -> STRING
 %import common.SIGNED_NUMBER    -> NUMBER
 %import common.CNAME
 %import common.WS
 %import .grammars.opcodes.NAME -> OPCODE_NAME
-// %import .grammars.terms (COMMA, DOT, LPAREN, RPAREN)
 %import .grammars.terms.DOT
 %import .grammars.terms.COMMA -> _COMMA
 %import .grammars.terms.COLON -> _COLON
 %import .grammars.terms.LPAREN -> _LPAREN
 %import .grammars.terms.RPAREN -> _RPAREN
-// %import .grammars.keywords (MOD, ACC_MOD, CON, INIT, CLINIT)
+
 %import .grammars.keywords (MOD, ACC_MOD, INIT, CLINIT, SYSTEM)
 %import .grammars.keywords.CON -> _CON
 %import .grammars.keywords.METHOD -> _K_METHOD
 %import .grammars.keywords.ANNO -> _K_ANNO
-// %import .grammars.directives (SUPER, SOURCE, END, IMPL, CLASS, FIELD, METHOD)
-%import .grammars.directives (SUPER, SOURCE, END, IMPL, CLASS, FIELD, LOCALS)
-%import .grammars.directives.ANNOTATION
+%import .grammars.keywords.FIELD -> _K_FIELD
+
+%import .grammars.directives.LOCALS
+%import .grammars.directives.FIELD -> _FIELD
+%import .grammars.directives.IMPL -> _IMPL
+%import .grammars.directives.SOURCE -> _SOURCE
+%import .grammars.directives.SUPER -> _SUPER
+%import .grammars.directives.CLASS -> _CLASS
+%import .grammars.directives.ANNO -> _ANNO
 %import .grammars.directives.METHOD -> _D_METHOD
 %import .grammars.directives.END -> _END
 %import .grammars.directives.CATCH -> _CATCH
