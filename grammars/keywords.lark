@@ -1,4 +1,4 @@
-MOD     : "static" | "final" | "abstract" | "synchronized" | "volatile"
+MOD     : "static" | "final" | "abstract" | "synchronized" | "volatile" | "synthetic"
 ACC_MOD : "public" | "private" | "protected"
 CON     : "constructor"
 INIT    : "<init>"

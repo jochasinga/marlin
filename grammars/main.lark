@@ -3,27 +3,28 @@
 // Panisuan Joe Chasinga <jo.chasinga@gmail.com>
 //
 
-?start : class
+?start : module
 
-class       : class_def class_body
-class_def   : class_header (_NEWLINE class_stmt)*
+// module      : class_def class_body
+module      : class_def
+class_def   : class_header (_NEWLINE class_stmt)* class_body
 class_body  : (_NEWLINE method_def)* [_NEWLINE]
-class_stmt  : super_stmt
+?class_stmt : super_stmt
             | source_stmt
             | impl_stmt
             | field_stmt
             | anno_stmt
 
 label : _COLON LABEL
-?class_header : _CLASS modifiers class_name
+class_header : _CLASS modifiers class_name
 modifiers    : [(mod)* (acc_mod)*]
 mod          : MOD
 acc_mod      : ACC_MOD
 class_name   : CLASS_NAME
 
 // Class header statements
-super_stmt       : _SUPER base_class_name
-?base_class_name : CLASS_NAME
+super_stmt : _SUPER base_class
+?base_class : class_name
 
 // Source statement
 source_stmt : _SOURCE file_name
@@ -39,22 +40,22 @@ method_stmt : op_stmt
             | anno_stmt
 
 // Annotation statement
-anno_stmt   : anno_header _NEWLINE anno_body _NEWLINE anno_end
-anno_header : _ANNO system class_name
-system      : SYSTEM
+anno_stmt   : anno_header _NEWLINE anno_body _NEWLINE _anno_end
+anno_header : _ANNO _system class_name
+_system      : SYSTEM
 anno_body   : "value = {" [_NEWLINE] values [_NEWLINE] "}"
-anno_end    : _END _K_ANNO [_NEWLINE]
-values      : [value (_COMMA value)*]
-?value      : STRING
-            | CLASS_NAME
+_anno_end   : _END _K_ANNO [_NEWLINE]
+values      : [_value (_COMMA _value)*]
+_value      : STRING
+            | class_name
 
 // Field statement
-field_stmt  : (field_block | field_def)
-field_def   : _FIELD modifiers symbol _COLON object
+?field_stmt : (field_block | field_def)
+field_def   : _FIELD modifiers symbol _COLON obj
 symbol      : SYMBOL
-object      : OBJECT
-field_block : field_def (_NEWLINE anno_stmt)* field_end
-field_end : _END _K_FIELD [_NEWLINE]
+obj         : OBJECT
+field_block : field_def (_NEWLINE anno_stmt)* _field_end
+_field_end  : _END _K_FIELD [_NEWLINE]
 
 // Opcode statement
 op_stmt : op_name (args)*

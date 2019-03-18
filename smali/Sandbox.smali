@@ -2,6 +2,7 @@
 # as possible to test the lexer's completeness.
 .class abstract LSandbox;
 .super Ljava/lang/Object;
+.super Lio/headspin/instrument/HSFingerprintManager;
 .source "foo.java"
 .implements Ljava/io/Closable;
 

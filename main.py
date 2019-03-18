@@ -1,4 +1,7 @@
 import re
+from transformer.transformer import Smali2Py
+
+from pprint import PrettyPrinter
 
 def gen_opcode_names():
     tmpl = 'NAME : {}'
@@ -30,13 +33,19 @@ if __name__ == '__main__':
     from opcodes import Opcode
     from libs.lark.lark import Lark
 
+    pp = PrettyPrinter(indent = 4, width = 10)
+
     gen_opcode_names()
 
     with open('smali/Sandbox.smali', 'r') as sm:
         text = sm.read()
 
     with open("grammars/main.lark", "r") as f:
-        smali_parser = Lark(r'' + f.read(), start = 'class')
+        smali_parser = Lark(r'' + f.read(), start = 'module')
         tree = smali_parser.parse(text)
 
     print(tree.pretty())
+
+    Smali2Py().transform(tree)
+
+    # pp.pprint(['1', 2, 'foo', {'bar': 1}])
