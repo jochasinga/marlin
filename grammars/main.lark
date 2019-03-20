@@ -5,7 +5,6 @@
 
 ?start : module
 
-// module      : class_def class_body
 module      : class_def
 class_def   : class_header (_NEWLINE class_stmt)* class_body
 class_body  : (_NEWLINE method_def)* [_NEWLINE]
@@ -34,15 +33,15 @@ source_stmt : _SOURCE file_name
 impl_stmt       : _IMPL interface_name
 ?interface_name : CLASS_NAME
 
-method_stmt : op_stmt
-            | dir_stmt
-            | field_stmt
-            | anno_stmt
+?method_stmt : op_stmt
+             | dir_stmt
+             | field_stmt
+             | anno_stmt
 
 // Annotation statement
 anno_stmt   : anno_header _NEWLINE anno_body _NEWLINE _anno_end
 anno_header : _ANNO _system class_name
-_system      : SYSTEM
+_system     : SYSTEM
 anno_body   : "value = {" [_NEWLINE] values [_NEWLINE] "}"
 _anno_end   : _END _K_ANNO [_NEWLINE]
 values      : [_value (_COMMA _value)*]
@@ -60,36 +59,36 @@ _field_end  : _END _K_FIELD [_NEWLINE]
 // Opcode statement
 op_stmt : op_name (args)*
 op_name : OPCODE_NAME
-args : arg (_COMMA arg)*
-arg  : label | VAR | OBJECT
+args    : arg (_COMMA arg)*
+arg     : label | VAR | OBJECT
 
 // Directive statement
 // .catch Ljava/security/NoSuchAlgorithmException; {:try_start_0 .. :try_end_0} :catch_1
 // .catch Ljava/security/KeyStoreException; {:try_start_0 .. :try_end_0} :catch_0
 dir_stmt: method_dir
-method_dir : line_dir
-           | catch_dir
-           | anno_stmt
+?method_dir : line_dir
+            | catch_dir
+            | anno_stmt
 line_dir : directive [dir_arg]
 
-directive : DIRECTIVE
-dir_arg   : NUMBER
+?directive : DIRECTIVE
+dir_arg    : NUMBER
 
 // Catch statement
-catch_dir : _CATCH error "{" label ".." label "}" label
-error : CLASS_NAME
+catch_dir    : _CATCH error_class "{" label ".." label "}" label
+?error_class : class_name
 
 // Method statement
-method_def    : method_header method_body method_end
-method_header : _D_METHOD [(mod)* (acc_mod)*] (constructor | method_name) method_sig
-constructor : (_CON (INIT | CLINIT))
-method_name : METHOD_NAME
-method_sig  : _LPAREN method_args _RPAREN return_type
-method_args : (method_arg)*
-method_arg  : METHOD_ARG
-method_body : (_NEWLINE (label | method_stmt))*
-method_end  : _END _K_METHOD [_NEWLINE]
-return_type : TYPE
+method_def    : method_header method_body _method_end
+method_header : _D_METHOD modifiers (constructor | method_name) method_sig
+constructor   : (_CON (INIT | CLINIT))
+method_name   : METHOD_NAME
+method_sig    : _LPAREN method_args _RPAREN return_type
+method_args   : (method_arg)*
+method_arg    : METHOD_ARG
+method_body   : (_NEWLINE (label | method_stmt))*
+_method_end   : _END _K_METHOD [_NEWLINE]
+return_type   : TYPE
 
 SYMBOL        : /[a-z]+/
 VAR           : /[pv][0-9]+/
