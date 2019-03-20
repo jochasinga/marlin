@@ -33,6 +33,8 @@
 
 .method constructor <init>()V
     # Meh comment
+    .catch Ljava/security/NoSuchAlgorithmException; {:try_start_0 .. :try_end_0} :catch_1
+    .catch Ljava/security/KeyStoreException; {:try_start_0 .. :try_end_0} :catch_0
 .end method
 
 .method constructor <clinit>()V
